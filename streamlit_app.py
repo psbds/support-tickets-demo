@@ -5,6 +5,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
+from PIL import Image
 
 # Show app title and description.
 st.set_page_config(page_title="Support tickets", page_icon="🎫")
@@ -66,36 +67,44 @@ if "df" not in st.session_state:
 
 
 # Show a section to add a new ticket.
-st.header("Add a ticket")
+st.header("Review")
 
 # We're adding tickets via an `st.form` and some input widgets. If widgets are used
 # in a form, the app will only rerun once the submit button is pressed.
-with st.form("add_ticket_form"):
-    issue = st.text_area("Describe the issue")
-    priority = st.selectbox("Priority", ["High", "Medium", "Low"])
-    submitted = st.form_submit_button("Submit")
 
-if submitted:
-    # Make a dataframe for the new ticket and append it to the dataframe in session
-    # state.
-    recent_ticket_number = int(max(st.session_state.df.ID).split("-")[1])
-    today = datetime.datetime.now().strftime("%m-%d-%Y")
-    df_new = pd.DataFrame(
-        [
-            {
-                "ID": f"TICKET-{recent_ticket_number+1}",
-                "Issue": issue,
-                "Status": "Open",
-                "Priority": priority,
-                "Date Submitted": today,
-            }
-        ]
-    )
 
-    # Show a little success message.
-    st.write("Ticket submitted! Here are the ticket details:")
-    st.dataframe(df_new, use_container_width=True, hide_index=True)
-    st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
+
+with st.container():
+
+    movie_name = st.text_input("Movie Name")
+    rating = st.feedback("stars")
+    review = st.text_area("Review")
+    cover = st.file_uploader(label="Choose an image file", key="cover", type=["png", "jpg", "jpeg"])
+    if cover is not None:
+        image = Image.open(cover)
+        st.image(image, caption="Uploaded Image", use_column_width=True)
+
+#if submitted:
+#    # Make a dataframe for the new ticket and append it to the dataframe in session
+#    # state.
+#    recent_ticket_number = int(max(st.session_state.df.ID).split("-")[1])
+#    today = datetime.datetime.now().strftime("%m-%d-%Y")
+#    df_new = pd.DataFrame(
+#        [
+#            {
+#                "ID": f"TICKET-{recent_ticket_number+1}",
+#                "Issue": issue,
+#                "Status": "Open",
+#                "Priority": priority,
+#                "Date Submitted": today,
+#            }
+#        ]
+#    )
+#
+#    # Show a little success message.
+#    st.write("Ticket submitted! Here are the ticket details:")
+#    st.dataframe(df_new, use_container_width=True, hide_index=True)
+#    st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
 
 # Show section to view and edit existing tickets in a table.
 st.header("Existing tickets")
